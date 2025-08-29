@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient Record - MedChain</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-right: 1rem;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">
+                <i class="fas fa-plus-circle"></i> Add Patient Record
+            </h1>
+            <p>Create a new secure patient record on the blockchain</p>
+        </div>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Patient Name <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" name="name" required 
+                               placeholder="Enter patient's full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Patient ID <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" name="uid" required 
+                               placeholder="e.g., P001, MED123">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Age <span class="required">*</span>
+                        </label>
+                        <input type="number" class="form-input" name="age" required 
+                               min="0" max="150" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Location <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" name="land" required 
+                               placeholder="City, State, Country">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Attending Doctor</label>
+                    <input type="text" class="form-input" name="doctor_name" 
+                           placeholder="Dr. John Smith">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Medical Condition/Diagnosis</label>
+                    <textarea class="form-input form-textarea" name="medical_condition" 
+                              placeholder="Describe the medical condition or reason for visit"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Prescription/Treatment</label>
+                    <textarea class="form-input form-textarea" name="prescription" 
+                              placeholder="Prescribed medications, treatments, or recommendations"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add to Blockchain
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Verification - MedChain</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            margin: 0.5rem;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .verification-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .verification-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .verification-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .card-icon {
+            font-size: 2rem;
+            color: #667eea;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .status-indicator {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin: 1rem 0;
+            display: none;
+        }
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-compromised {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-checking {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .live-log {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 8px;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre-line;
+            border: 2px solid #333;
+            display: none;
+        }
+        .hash-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+        .hash-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .hash-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-line;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+            display: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .verification-results {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            display: none;
+        }
+        .report-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+        .report-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .report-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .health-display {
+            margin-top: 1rem;
+        }
+        .health-bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .health-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">
+                <i class="fas fa-shield-alt"></i> Blockchain Verification Center
+            </h1>
+            <p>Comprehensive integrity verification and tamper detection</p>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <a href="/" class="btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="verification-dashboard">
+            <div class="verification-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="card-title">Live Verification Process</div>
+                </div>
+                <p>Watch the verification process step-by-step</p>
+                <button class="btn" onclick="liveVerification()">
+                    <i class="fas fa-play"></i> Start Live Verification
+                </button>
+                <div id="quickStatus" class="status-indicator"></div>
+                <div class="progress-bar" id="progressBarContainer">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="live-log" id="liveLog">Starting verification process...</div>
+            </div>
+
+            <div class="verification-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-hashtag"></i>
+                    </div>
+                    <div class="card-title">Verify by Hash</div>
+                </div>
+                <p>Verify a specific block using its hash value</p>
+                <input type="text" class="hash-input" id="hashInput" placeholder="Enter block hash (full or first 16 characters)">
+                <button class="btn" onclick="verifyByHash()">
+                    <i class="fas fa-search"></i> Verify Block
+                </button>
+                <div id="hashResult" class="hash-result"></div>
+            </div>
+
+            <div class="verification-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="card-title">Report</div>
+                </div>
+                <p>Generate comprehensive verification reports and view detailed analysis</p>
+                <button class="btn" onclick="generateReport()">
+                    <i class="fas fa-file-contract"></i> Generate Report
+                </button>
+                <a href="/verification_report" class="btn btn-success">
+                    <i class="fas fa-eye"></i> View Report
+                </a>
+                <div id="reportStatus" class="report-status"></div>
+            </div>
+
+            <div class="verification-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="card-title">Health Monitor</div>
+                </div>
+                <p>Monitor blockchain health in real-time</p>
+                <button class="btn" onclick="healthCheck()">
+                    <i class="fas fa-stethoscope"></i> Health Check
+                </button>
+                <div id="healthStatus" class="health-display"></div>
+            </div>
+        </div>
+
+        <div class="verification-results" id="verificationResults">
+            <h2><i class="fas fa-clipboard-check"></i> Detailed Verification Results</h2>
+            <div id="verificationContent"></div>
+        </div>
+    </div>
+
+    <script>
+        async function liveVerification() {
+            const statusDiv = document.getElementById('quickStatus');
+            const logDiv = document.getElementById('liveLog');
+            const progressContainer = document.getElementById('progressBarContainer');
+            const progressBar = document.getElementById('progressBar');
+
+            // Show elements
+            statusDiv.style.display = 'block';
+            logDiv.style.display = 'block';
+            progressContainer.style.display = 'block';
+            
+            statusDiv.className = 'status-indicator status-checking';
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running live verification...';
+            
+            logDiv.textContent = 'Connecting to verification system...\n';
+            progressBar.style.width = '10%';
+
+            try {
+                const response = await fetch('/api/verify_step_by_step');
+                const data = await response.json();
+                
+                // Display logs one by one with animation
+                logDiv.textContent = '';
+                for (let i = 0; i < data.logs.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay between logs
+                    logDiv.textContent += data.logs[i] + '\n';
+                    logDiv.scrollTop = logDiv.scrollHeight;
+                    
+                    // Update progress
+                    const progress = ((i + 1) / data.logs.length) * 100;
+                    progressBar.style.width = progress + '%';
+                }
+                
+                // Final status
+                if (data.status === 'verified') {
+                    statusDiv.className = 'status-indicator status-healthy';
+                    statusDiv.innerHTML = '<i class="fas fa-check"></i> Blockchain VERIFIED ✅';
+                    progressBar.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                } else if (data.status === 'compromised') {
+                    statusDiv.className = 'status-indicator status-compromised';
+                    statusDiv.innerHTML = '<i class="fas fa-times"></i> Blockchain COMPROMISED ❌';
+                    progressBar.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+                } else {
+                    statusDiv.className = 'status-indicator status-checking';
+                    statusDiv.innerHTML = '<i class="fas fa-info"></i> Blockchain is empty';
+                    progressBar.style.background = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+                }
+                
+                progressBar.style.width = '100%';
+                
+            } catch (error) {
+                statusDiv.className = 'status-indicator status-compromised';
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Verification failed';
+                logDiv.textContent += 'ERROR: ' + error.message;
+                progressBar.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+            }
+        }
+
+        async function verifyByHash() {
+            const hashInput = document.getElementById('hashInput');
+            const resultDiv = document.getElementById('hashResult');
+            const hash = hashInput.value.trim();
+            
+            if (!hash) {
+                alert('Please enter a block hash');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Searching for block with hash: ' + hash + '\nVerifying...';
+            
+            try {
+                const response = await fetch('/api/verify_block_by_hash?hash=' + encodeURIComponent(hash));
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultDiv.textContent = '❌ ERROR: ' + data.error;
+                } else {
+                    let result = `✅ Block #${data.block_id} Verification Results\n`;
+                    result += `\nPatient: ${data.patient_name}\n`;
+                    result += `Verification Time: ${data.verification_timestamp}\n`;
+                    result += `Hash Valid: ${data.hash_valid ? '✅ YES' : '❌ NO'}\n`;
+                    result += `Mining Valid: ${data.mining_valid ? '✅ YES' : '❌ NO'}\n`;
+                    result += `Nonce: ${data.nonce}\n`;
+                    result += `\nStored Hash:\n${data.stored_hash}\n`;
+                    result += `\nCalculated Hash:\n${data.calculated_hash}\n`;
+                    result += `\nPatient Data Integrity:\n`;
+                    for (const [key, value] of Object.entries(data.data_integrity)) {
+                        result += `  ${key}: ${value}\n`;
+                    }
+                    
+                    resultDiv.textContent = result;
+                }
+            } catch (error) {
+                resultDiv.textContent = '❌ Verification failed: ' + error.message;
+            }
+        }
+
+        async function generateReport() {
+            const reportStatusDiv = document.getElementById('reportStatus');
+            const resultsDiv = document.getElementById('verificationResults');
+            const contentDiv = document.getElementById('verificationContent');
+            
+            // Show report generation status
+            reportStatusDiv.style.display = 'block';
+            reportStatusDiv.className = 'report-status';
+            reportStatusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating comprehensive verification report...';
+            
+            try {
+                const response = await fetch('/api/verify_integrity');
+                const data = await response.json();
+                
+                // Show success message
+                reportStatusDiv.className = 'report-status report-success';
+                reportStatusDiv.innerHTML = '<i class="fas fa-check"></i> Report generated successfully! View detailed results below or click "View Report" for full page.';
+                
+                // Display report summary
+                resultsDiv.style.display = 'block';
+                
+                let html = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #667eea;">${data.total_blocks}</div>
+                            <div style="font-size: 0.9rem; color: #666;">Total Blocks</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #667eea;">${data.statistics.valid_blocks}</div>
+                            <div style="font-size: 0.9rem; color: #666;">Valid Blocks</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #667eea;">${data.verification_time_ms}ms</div>
+                            <div style="font-size: 0.9rem; color: #666;">Verification Time</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: ${data.overall_integrity ? '#28a745' : '#dc3545'};">
+                                ${data.overall_integrity ? '✅ VERIFIED' : '❌ COMPROMISED'}
+                            </div>
+                            <div style="font-size: 0.9rem; color: #666;">Overall Status</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <a href="/verification_report" class="btn btn-success" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                            <i class="fas fa-external-link-alt"></i> View Complete Report
+                        </a>
+                    </div>
+                `;
+
+                contentDiv.innerHTML = html;
+                
+            } catch (error) {
+                reportStatusDiv.className = 'report-status report-error';
+                reportStatusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to generate report: ' + error.message;
+            }
+        }
+
+        async function healthCheck() {
+            const healthDiv = document.getElementById('healthStatus');
+            
+            try {
+                const response = await fetch('/api/blockchain_health');
+                const data = await response.json();
+                
+                const healthColor = data.health_score === 100 ? '#28a745' : 
+                                   data.health_score >= 75 ? '#ffc107' : '#dc3545';
+                
+                healthDiv.innerHTML = `
+                    <div class="health-bar">
+                        <div class="health-fill" style="width: ${data.health_score}%; background: ${healthColor};"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 0.5rem;">
+                        <strong>Health Score: ${data.health_score}%</strong><br>
+                        <small>Status: ${data.status.toUpperCase()}</small><br>
+                        <small>Blocks: ${data.valid_blocks}/${data.total_blocks}</small><br>
+                        <small>Last Check: ${data.last_verified}</small>
+                    </div>
+                `;
+            } catch (error) {
+                healthDiv.innerHTML = '<div style="color: #dc3545; text-align: center; padding: 1rem;">❌ Health check failed</div>';
+            }
+        }
+
+        // Auto-refresh health status every 30 seconds
+        setInterval(healthCheck, 30000);
+        
+        // Initial health check on page load
+        window.onload = function() {
+            healthCheck();
+            console.log('✅ Verification Center loaded successfully');
+        };
+    </script>
+</body>
+</html>

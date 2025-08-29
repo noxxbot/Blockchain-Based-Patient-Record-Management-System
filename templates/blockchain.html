@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Explorer - MedChain</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .blockchain-container {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 15px;
+            padding: 30px;
+        }
+        .block {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: #fafafa;
+            overflow: hidden;
+        }
+        .block.verified {
+            border-color: #28a745;
+        }
+        .block-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .block-id {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .block-hash {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .block-body {
+            padding: 20px;
+        }
+        .patient-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        .btn-back {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .no-records {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        .verification-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⛓️ Blockchain Explorer</h1>
+            <p>Complete blockchain ledger of patient records</p>
+        </div>
+
+        <a href="/" class="btn-back">← Back to Dashboard</a>
+
+        <div class="stats">
+            <strong>Total Blocks:</strong> {{ total_blocks }} | 
+            <strong>Integrity:</strong> 
+            {% if integrity_status %}
+                <span style="color: #28a745;">✅ VERIFIED</span>
+            {% else %}
+                <span style="color: #dc3545;">❌ COMPROMISED</span>
+            {% endif %}
+        </div>
+
+        <div class="blockchain-container">
+            {% if blockchain %}
+                {% for block in blockchain %}
+                <div class="block {% if block.is_verified %}verified{% endif %}">
+                    <div class="block-header">
+                        <div>
+                            <div class="block-id">Block #{{ block.block_id }}</div>
+                            <div class="block-hash">Hash: {{ block.hash }}</div>
+                        </div>
+                        <div class="verification-badge">
+                            ✅ VERIFIED
+                        </div>
+                    </div>
+
+                    <div class="block-body">
+                        <div class="patient-info">
+                            <div class="info-item">
+                                <div class="info-label">Patient Name</div>
+                                <div class="info-value">{{ block.name }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Patient ID</div>
+                                <div class="info-value">{{ block.uid }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Age</div>
+                                <div class="info-value">{{ block.age }} years</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Location</div>
+                                <div class="info-value">{{ block.land }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Medical Condition</div>
+                                <div class="info-value">{{ block.medical_condition }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Doctor</div>
+                                <div class="info-value">{{ block.doctor_name }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Timestamp</div>
+                                <div class="info-value">{{ block.timestamp }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Nonce</div>
+                                <div class="info-value">{{ block.nonce }}</div>
+                            </div>
+                        </div>
+
+                        {% if block.prescription != "None prescribed" %}
+                        <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <div class="info-label">Prescription/Treatment</div>
+                            <div class="info-value">{{ block.prescription }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-records">
+                    <div style="font-size: 60px; opacity: 0.3; margin-bottom: 20px;">📦</div>
+                    <h3>No Records Found</h3>
+                    <p>The blockchain is empty. Add the first patient record to get started.</p>
+                    <a href="/add_record" class="btn-back" style="margin-top: 20px;">➕ Add First Record</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Report - MedChain</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .report-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .report-header {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .verification-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .summary-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        .summary-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .summary-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            border: none;
+        }
+        .refresh-btn {
+            background: #28a745;
+            float: right;
+        }
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        .loading i {
+            font-size: 3rem;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-medical-alt"></i> Blockchain Verification Report</h1>
+            <p>Comprehensive integrity analysis and tamper detection report</p>
+        </div>
+
+        <div class="report-container">
+            <div class="report-header">
+                <a href="/verification" class="btn">
+                    <i class="fas fa-arrow-left"></i> Back to Verification
+                </a>
+                <button class="btn refresh-btn" onclick="generateReport()">
+                    <i class="fas fa-sync-alt"></i> Refresh Report
+                </button>
+                <div style="clear: both;"></div>
+            </div>
+
+            <div id="reportContent">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <h3>Generating Verification Report...</h3>
+                    <p>Please wait while we analyze your blockchain integrity</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateReport() {
+            const contentDiv = document.getElementById('reportContent');
+            contentDiv.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <h3>Analyzing Blockchain...</h3>
+                    <p>Performing comprehensive verification checks</p>
+                </div>
+            `;
+
+            try {
+                const [integrityResponse, healthResponse] = await Promise.all([
+                    fetch('/api/verify_integrity'),
+                    fetch('/api/blockchain_health')
+                ]);
+
+                const integrityData = await integrityResponse.json();
+                const healthData = await healthResponse.json();
+
+                const reportHtml = `
+                    <div class="report-header">
+                        <h2><i class="fas fa-shield-alt"></i> Verification Report</h2>
+                        <p><strong>Generated:</strong> ${integrityData.timestamp}</p>
+                        <p><strong>Verification Time:</strong> ${integrityData.verification_time_ms}ms</p>
+                    </div>
+
+                    <div class="verification-summary">
+                        <div class="summary-card">
+                            <div class="summary-number">${integrityData.total_blocks}</div>
+                            <div class="summary-label">Total Blocks</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number">${integrityData.statistics.valid_blocks}</div>
+                            <div class="summary-label">Valid Blocks</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number">${integrityData.statistics.invalid_blocks}</div>
+                            <div class="summary-label">Invalid Blocks</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number">${healthData.health_score}%</div>
+                            <div class="summary-label">Health Score</div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2rem; margin: 1rem 0; border-radius: 10px; text-align: center; 
+                                background: ${integrityData.overall_integrity ? '#d4edda' : '#f8d7da'};
+                                border: 1px solid ${integrityData.overall_integrity ? '#c3e6cb' : '#f5c6cb'};
+                                color: ${integrityData.overall_integrity ? '#155724' : '#721c24'};">
+                        <h3>
+                            <i class="fas fa-${integrityData.overall_integrity ? 'check-circle' : 'exclamation-triangle'}"></i>
+                            Overall Status: ${integrityData.overall_integrity ? 'BLOCKCHAIN VERIFIED' : 'INTEGRITY COMPROMISED'}
+                        </h3>
+                    </div>
+
+                    ${integrityData.issues.length > 0 ? `
+                        <div style="background: #f8d7da; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border: 1px solid #f5c6cb;">
+                            <h4 style="color: #721c24; margin-bottom: 1rem;">
+                                <i class="fas fa-exclamation-triangle"></i> Critical Issues Detected
+                            </h4>
+                            <ul style="color: #721c24;">
+                                ${integrityData.issues.map(issue => `<li style="margin: 0.5rem 0;">${issue}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : `
+                        <div style="background: #d4edda; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border: 1px solid #c3e6cb;">
+                            <h4 style="color: #155724;">
+                                <i class="fas fa-check-circle"></i> No Issues Detected
+                            </h4>
+                            <p style="color: #155724;">All blockchain integrity checks passed successfully.</p>
+                        </div>
+                    `}
+
+                    <h3 style="margin: 2rem 0 1rem 0;">
+                        <i class="fas fa-cubes"></i> Individual Block Analysis
+                    </h3>
+
+                    ${integrityData.blocks.map(block => `
+                        <div style="border: 1px solid #e0e0e0; border-radius: 10px; margin: 1rem 0; padding: 1.5rem; 
+                                    background: #fafafa; border-left: 4px solid ${block.is_valid ? '#28a745' : '#dc3545'};">
+                            <h4>Block #${block.block_id} - ${block.patient_name}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                                <div><strong>Patient ID:</strong> ${block.patient_id}</div>
+                                <div><strong>Timestamp:</strong> ${block.timestamp}</div>
+                                <div><strong>Nonce:</strong> ${block.nonce}</div>
+                                <div><strong>Status:</strong> 
+                                    <span style="color: ${block.is_valid ? '#28a745' : '#dc3545'};">
+                                        ${block.is_valid ? '✅ VALID' : '❌ INVALID'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Hash Verification:</strong><br>
+                                <code style="font-size: 0.8rem; color: ${block.stored_hash === block.calculated_hash ? '#28a745' : '#dc3545'};">
+                                    Stored: ${block.stored_hash}<br>
+                                    Calculated: ${block.calculated_hash}<br>
+                                    Match: ${block.stored_hash === block.calculated_hash ? '✅ Yes' : '❌ No'}
+                                </code>
+                            </div>
+                            ${block.issues.length > 0 ? `
+                                <div style="background: #f8d7da; padding: 1rem; border-radius: 8px; border: 1px solid #f5c6cb;">
+                                    <strong style="color: #721c24;">Issues Found:</strong>
+                                    <ul style="color: #721c24; margin: 0.5rem 0;">
+                                        ${block.issues.map(issue => `<li>${issue}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+
+                    <div style="margin-top: 3rem; padding: 2rem; background: #f8f9fa; border-radius: 10px; text-align: center;">
+                        <h4><i class="fas fa-info-circle"></i> Report Summary</h4>
+                        <p>This verification report confirms the cryptographic integrity of your MedChain blockchain.</p>
+                        <p><strong>Next Verification Recommended:</strong> ${new Date(Date.now() + 24*60*60*1000).toLocaleDateString()}</p>
+                    </div>
+                `;
+
+                contentDiv.innerHTML = reportHtml;
+
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; background: #f8d7da; border-radius: 10px; color: #721c24;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <h3>Report Generation Failed</h3>
+                        <p>Unable to generate verification report. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Generate report on page load
+        window.onload = generateReport;
+    </script>
+</body>
+</html>
